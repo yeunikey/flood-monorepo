@@ -1,17 +1,18 @@
 'use client'
 
-import { cn } from "@/util/utils";
-import { Button, TextField, IconButton } from "@mui/material";
-import SendIcon from '@mui/icons-material/Send';
+import { ApiResponse, User } from "@/types";
+import { Button, IconButton, TextField } from "@mui/material";
+
 import CheckIcon from '@mui/icons-material/Check';
 import Loading from "@/components/Loading";
-import { toast } from "react-toastify";
+import SendIcon from '@mui/icons-material/Send';
 import { api } from "@/api/instance";
-import { ApiResponse, User } from "@/types";
-import { useState } from "react";
+import { cn } from "@/util/utils";
+import { toast } from "react-toastify";
 import { useAuth } from "@/hooks/auth";
+import { useState } from "react";
 
-function Security() {
+function SettingsSecurity() {
 
     const { user, token, setUser } = useAuth();
 
@@ -258,4 +259,4 @@ function Security() {
     );
 }
 
-export default Security;
+export default SettingsSecurity;

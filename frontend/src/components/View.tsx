@@ -1,28 +1,30 @@
 'use client'
 
 import * as React from 'react';
-import { useTheme } from '@mui/material/styles';
+
+import { AppBar, Drawer, DrawerHeader } from '@/components/mixin/view';
+import { Avatar, InputBase, Menu, MenuItem, Paper } from '@mui/material';
+
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import Cookies from 'js-cookie';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { AppBar, DrawerHeader, Drawer } from '@/components/mixin/view';
-import { ways } from '@/config/paths';
-import { useRouter } from 'next/navigation';
-import { Avatar, InputBase, Menu, MenuItem, Paper } from '@mui/material';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import SearchIcon from '@mui/icons-material/Search';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 import { deepOrange } from '@mui/material/colors';
 import { useAuth } from '@/hooks/auth';
-import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import { useTheme } from '@mui/material/styles';
+import { ways } from '@/config/paths';
 
 interface ViewProps {
     children?: React.ReactNode
@@ -210,12 +212,9 @@ function View({ children }: ViewProps) {
                 })()}
             </Drawer>
 
-            <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: 'full' }}>
-                <Toolbar />
-                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                    {children}
-                </Box>
-            </Box>
+            <div className='grow relative mt-16 flex flex-col w-full'>
+                {children}
+            </div>
         </Box>
     );
 }

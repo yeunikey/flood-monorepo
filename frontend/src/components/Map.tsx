@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
 import { Box, CircularProgress, Typography } from '@mui/material';
+import { useEffect, useRef } from 'react';
+
+import mapboxgl from 'mapbox-gl';
 import { useMap } from '@/hooks/map';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoieWV1bmlrZXkiLCJhIjoiY205cjdpbTV5MWxyazJpc2FiMWZ3NnVjaSJ9.Fm89p6MOyo_GqvT4uEXpeQ';
@@ -20,8 +21,12 @@ const Map = () => {
             style: 'mapbox://styles/mapbox/satellite-streets-v12',
             center: [84, 49], // Координаты Алматы
             zoom: 10,
-            attributionControl: false
+            attributionControl: false,
+            logoPosition: 'top-left',
         });
+
+        mapRef.current.addControl(new mapboxgl.ScaleControl());
+
         setMap(mapRef.current);
 
         return () => {

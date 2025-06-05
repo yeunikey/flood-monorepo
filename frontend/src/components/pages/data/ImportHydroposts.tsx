@@ -36,15 +36,20 @@ function ImportHydropostsModal({ open, setOpen, type }: ModalProps) {
             header: true,
             skipEmptyLines: true,
             complete: (results) => {
-                const cleaned = results.data.map((row) => ({
-                    name: row.name,
-                    code: row.code,
-                    altitude: Number(row.altitude),
-                    longtitude: Number(row.longtitude),
-                    siteType: {
-                        id: type.id
+                const cleaned = results.data.filter((row) => (
+                    row.name != "" && row.code != ""
+                )).map((row) => (
+                    {
+                        name: row.name,
+                        code: row.code,
+                        altitude: Number(row.altitude),
+                        longtitude: Number(row.longtitude),
+                        siteType: {
+                            id: type.id
+                        }
                     }
-                }));
+                ));
+
                 setParsedData(cleaned);
                 console.log(cleaned)
             },

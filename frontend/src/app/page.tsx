@@ -1,20 +1,20 @@
 'use client'
 
-import Links from "@/components/LinkList";
-import View from "@/components/View";
-import { Box, Divider, IconButton, List, Tooltip, Typography } from "@mui/material";
-import Map from "@/components/Map";
-import { useEffect, useState } from "react";
-import AddModal from "@/components/pages/layers/AddModal";
-
-import NoteAddIcon from '@mui/icons-material/NoteAdd';
-import { useMap } from "@/hooks/map";
-import { useAuth } from "@/hooks/auth";
-import { api } from "@/api/instance";
 import { ApiResponse, Layer } from "@/types";
-import { toast } from "react-toastify";
-import { useLayers } from "@/hooks/layers";
+import { Box, Divider, IconButton, List, Tooltip, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+
+import AddModal from "@/components/pages/layers/AddModal";
 import LayerItem from "@/components/pages/layers/LayerItem";
+import Links from "@/components/LinkList";
+import Map from "@/components/Map";
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import View from "@/components/View";
+import { api } from "@/api/instance";
+import { toast } from "react-toastify";
+import { useAuth } from "@/hooks/auth";
+import { useLayers } from "@/hooks/layers";
+import { useMap } from "@/hooks/map";
 
 export default function HomePage() {
   const { token } = useAuth();
@@ -74,17 +74,28 @@ export default function HomePage() {
             source: String(layer.file),
             layout: {},
             paint: {
-              'line-color': '#de2828',
+              'line-color': '#04b5f5',
               'line-width': 2,
             },
           });
+
+          if (layer.name == 'Озера') {
+            map.addLayer({
+              id: `${layer.file}-fill`,
+              type: 'fill',
+              source: String(layer.file),
+              layout: {},
+              paint: {
+                'fill-color': '#04b5f5',
+              },
+            });
+          }
         }
       }
 
       setLoading(false);
     }
   }, [map, layers]);
-
 
   return (
     <View>
@@ -121,7 +132,7 @@ export default function HomePage() {
 
         <Divider orientation="vertical" />
 
-        <div className="grow">
+        <div className="w-full h-full">
           <Map />
         </div>
       </Box>

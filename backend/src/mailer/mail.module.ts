@@ -15,6 +15,9 @@ import { MailerModule } from '@nestjs-modules/mailer';
                     user: 'support@unilabs.studio',
                     pass: 'TEUdNkLjVYvsxk1RBVtJ', // Пароль приложения
                 },
+                tls: {
+                    rejectUnauthorized: false, // Ignore self-signed certificate errors
+                },
             },
             defaults: {
                 from: '"No Reply" <support@unilabs.studio>'

@@ -1,10 +1,12 @@
 'use client'
 
+import { Box, Tab, Tabs, Typography } from "@mui/material";
+
 import Links from "@/components/LinkList";
-import Security from "@/components/pages/settings/Security";
 import SettingsImage from "@/components/pages/settings/SettingsImage";
+import SettingsMap from "@/components/pages/settings/SettingsMap";
+import SettingsSecurity from "@/components/pages/settings/Security";
 import View from "@/components/View";
-import { Typography, Box, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 
 export default function SettingsPage() {
@@ -29,12 +31,14 @@ export default function SettingsPage() {
                     scrollButtons="auto"
                     aria-label="scrollable auto tabs example"
                 >
+                    <Tab label="Карта" />
                     <Tab label="Безопасность" />
                     <Tab label="Изображение" />
                 </Tabs>
 
-                {tab == 0 && (<Security />)}
-                {tab == 1 && (<SettingsImage />)}
+                {tab == 0 && (<SettingsMap />)}
+                {tab == 1 && (<SettingsSecurity />)}
+                {tab == 2 && (<SettingsImage />)}
             </Box>
 
         </View>

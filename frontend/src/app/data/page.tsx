@@ -125,8 +125,9 @@ export default function DataPage() {
                     scrollButtons="auto"
                     aria-label="scrollable auto tabs example"
                 >
-                    <Tab label="Гидропосты" />
-                    <Tab label="Метеостанции" />
+                    {types.map((type) => (
+                        <Tab label={type.name} />
+                    ))}
                 </Tabs>
 
                 <div className="flex flex-col gap-2 mt-6">

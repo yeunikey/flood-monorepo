@@ -1,20 +1,19 @@
 'use client'
 
-import Links from "@/components/LinkList";
-import View from "@/components/View";
-import { Typography, Box, Divider, List, ListItemButton, ListItemText } from "@mui/material";
-
-import Map from "@/components/Map";
-import { useMap } from "@/hooks/map";
+import { ApiResponse, Site, SiteType } from "@/types";
+import { Divider, List, ListItemButton, ListItemText, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 
-import { ApiResponse, Site, SiteType } from "@/types";
-import { useAuth } from "@/hooks/auth";
-import { api } from "@/api/instance";
-import SiteTypes from "@/components/pages/objects/SiteTypes";
+import Links from "@/components/LinkList";
 import Loading from "@/components/Loading";
-import { useSite } from "@/hooks/sites";
+import Map from "@/components/Map";
+import SiteTypes from "@/components/pages/objects/SiteTypes";
+import View from "@/components/View";
+import { api } from "@/api/instance";
 import mapboxgl from "mapbox-gl";
+import { useAuth } from "@/hooks/auth";
+import { useMap } from "@/hooks/map";
+import { useSite } from "@/hooks/sites";
 
 export default function ObjectsPage() {
 
@@ -120,8 +119,8 @@ export default function ObjectsPage() {
                 <Typography sx={{ color: 'text.primary' }}>Объекты</Typography>
             </Links>
 
-            <Box sx={{ flexGrow: 1, display: 'flex', height: '100%' }}>
-                <div className={`transition-all duration-300 w-64`}>
+            <div className="flex grow relative">
+                <div className={`transition-all duration-300 overflow-y-auto h-[calc(100dvh-8rem)] min-w-72`}>
 
                     {fetching
                         ? (
@@ -139,7 +138,7 @@ export default function ObjectsPage() {
 
                 <Divider orientation="vertical" />
 
-                <div className={`w-64 max-h-[80dvh] overflow-scroll`}>
+                <div className="overflow-y-auto h-[calc(100dvh-8rem)] min-w-72 bg-white">
                     <List>
                         {sites.map((site, i) => {
                             return (
@@ -163,10 +162,11 @@ export default function ObjectsPage() {
 
                 <Divider orientation="vertical" />
 
-                <div className="grow">
+                <div className="w-full h-full">
                     <Map />
                 </div>
-            </Box>
+
+            </div>
 
         </View >
     )
