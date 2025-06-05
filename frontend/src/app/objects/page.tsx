@@ -1,24 +1,23 @@
 'use client'
 
-import { ApiResponse, Site, SiteType } from "@/types";
+import { ApiResponse, Category } from "@/types";
 import { Divider, List, ListItemButton, ListItemText, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 
 import Links from "@/components/LinkList";
 import Loading from "@/components/Loading";
 import Map from "@/components/Map";
-import SiteTypes from "@/components/pages/objects/SiteTypes";
+import SiteTypes from "@/components/objects/SiteTypes";
 import View from "@/components/View";
 import { api } from "@/api/instance";
-import mapboxgl from "mapbox-gl";
 import { useAuth } from "@/hooks/auth";
+import { useCategories } from "@/hooks/category";
 import { useMap } from "@/hooks/map";
-import { useSite } from "@/hooks/sites";
 
 export default function ObjectsPage() {
 
     const { token } = useAuth();
-    const { types, setTypes, sites, setSites } = useSite();
+    const { categories, setCategories } = useCategories();
 
     const [selected, setSelected] = useState(0);
     const [fetching, setFetching] = useState(true);
@@ -27,69 +26,36 @@ export default function ObjectsPage() {
 
     const markerRefs = useRef<mapboxgl.Marker[]>([]);
 
-    useEffect(() => {
-        if (!map || sites.length === 0) return;
+    // useEffect(() => {
+    //     if (!map || categories.length === 0) return;
 
-        const addMarkers = () => {
+    //     const addMarkers = () => {
 
-            markerRefs.current.forEach(marker => marker.remove());
-            markerRefs.current = [];
+    //         markerRefs.current.forEach(marker => marker.remove());
+    //         markerRefs.current = [];
 
-            for (const site of sites) {
-                const marker = new mapboxgl.Marker()
-                    .setLngLat([site.longtitude, site.altitude])
-                    .setPopup(new mapboxgl.Popup().setText(site.name))
-                    .addTo(map);
+    //         for (const site of sites) {
+    //             const marker = new mapboxgl.Marker()
+    //                 .setLngLat([site.longtitude, site.altitude])
+    //                 .setPopup(new mapboxgl.Popup().setText(site.name))
+    //                 .addTo(map);
 
-                markerRefs.current.push(marker);
-            }
-        };
+    //             markerRefs.current.push(marker);
+    //         }
+    //     };
 
-        if (!map.isStyleLoaded()) {
-            map.once('load', addMarkers);
-        } else {
-            addMarkers();
-        }
+    //     if (!map.isStyleLoaded()) {
+    //         map.once('load', addMarkers);
+    //     } else {
+    //         addMarkers();
+    //     }
 
-        return () => {
-            markerRefs.current.forEach(marker => marker.remove());
-            markerRefs.current = [];
-        };
+    //     return () => {
+    //         markerRefs.current.forEach(marker => marker.remove());
+    //         markerRefs.current = [];
+    //     };
 
-    }, [map, sites]);
-
-    const fetchData = async () => {
-        await api.get<ApiResponse<Site[]>>('/sites/filter?site_type=' + types[selected].id, {
-            headers: {
-                Authorization: 'Bearer ' + token
-            }
-        })
-            .then((response) => {
-                setSites(response.data.data)
-            });
-    }
-
-    const fetchTypes = async () => {
-        await api.get<ApiResponse<SiteType[]>>('/sites/types', {
-            headers: {
-                Authorization: 'Bearer ' + token
-            }
-        })
-            .then(({ data }) => {
-                setTypes(data.data);
-            }).finally(() => {
-                setFetching(false);
-            })
-    }
-
-    useEffect(() => {
-        if (token == "" || types.length != 0) {
-            setFetching(false);
-            return;
-        }
-
-        fetchTypes();
-    }, [token])
+    // }, [map, sites]);
 
     useEffect(() => {
 
@@ -103,13 +69,24 @@ export default function ObjectsPage() {
 
     }, [map])
 
+    const fetchCategories = async () => {
+        await api.get<ApiResponse<Category[]>>('/data/category', {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((response) => {
+                setCategories(response.data.data)
+            });
+    }
+
     useEffect(() => {
-        if (types.length == 0) {
+        if (categories.length == 0 || token == "") {
             return;
         }
 
-        fetchData();
-    }, [selected, types]);
+        fetchCategories();
+    }, [token]);
 
     return (
         <View>
@@ -140,7 +117,7 @@ export default function ObjectsPage() {
 
                 <div className="overflow-y-auto h-[calc(100dvh-8rem)] min-w-72 bg-white">
                     <List>
-                        {sites.map((site, i) => {
+                        {/* {sites.map((site, i) => {
                             return (
                                 <ListItemButton key={i} onClick={() => {
                                     if (map == null) {
@@ -156,7 +133,7 @@ export default function ObjectsPage() {
                                     <ListItemText primary={site.name} secondary={'#' + site.code} />
                                 </ListItemButton>
                             )
-                        })}
+                        })} */}
                     </List>
                 </div>
 

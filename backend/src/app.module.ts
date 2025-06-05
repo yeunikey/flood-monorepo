@@ -38,7 +38,7 @@ import { Variable } from './data/entities/variable.entity';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: 'postgres',
+      password: '1234',
       database: 'flood',
       entities: [
         User,

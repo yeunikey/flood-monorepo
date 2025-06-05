@@ -4,8 +4,8 @@ import { ApiResponse, Layer } from "@/types";
 import { Box, Divider, IconButton, List, Tooltip, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
-import AddModal from "@/components/pages/layers/AddModal";
-import LayerItem from "@/components/pages/layers/LayerItem";
+import AddModal from "@/components/layers/AddModal";
+import LayerItem from "@/components/layers/LayerItem";
 import Links from "@/components/LinkList";
 import Map from "@/components/Map";
 import NoteAddIcon from '@mui/icons-material/NoteAdd';

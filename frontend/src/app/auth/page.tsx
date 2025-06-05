@@ -1,12 +1,13 @@
 'use client'
 
-import { api } from "@/api/instance";
 import { ApiResponse, User } from "@/types";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { useState } from "react";
-import { toast } from "react-toastify";
+
+import CodeModal from "@/components/auth/CodeModal";
 import Cookies from 'js-cookie';
-import CodeModal from "@/components/pages/auth/CodeModal";
+import { api } from "@/api/instance";
+import { toast } from "react-toastify";
+import { useState } from "react";
 
 const imageLink = 'https://flomaster.top/uploads/posts/2023-01/1673515182_flomaster-club-p-pavodok-risunok-instagram-13.jpg';
 

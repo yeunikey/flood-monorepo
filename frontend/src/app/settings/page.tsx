@@ -3,9 +3,9 @@
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 
 import Links from "@/components/LinkList";
-import SettingsImage from "@/components/pages/settings/SettingsImage";
-import SettingsMap from "@/components/pages/settings/SettingsMap";
-import SettingsSecurity from "@/components/pages/settings/Security";
+import SettingsImage from "@/components/settings/SettingsImage";
+import SettingsMap from "@/components/settings/SettingsMap";
+import SettingsSecurity from "@/components/settings/Security";
 import View from "@/components/View";
 import { useState } from "react";
 

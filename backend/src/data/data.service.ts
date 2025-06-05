@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { Catalog } from './entities/catalog.entity';
 import { Category } from './entities/category.entity';
 import { DataValue } from './entities/data_value.entity';
@@ -47,11 +47,39 @@ export class DataService {
         private qclRepo: Repository<Qcl>,
     ) { }
 
+    async findCategoryById(id: number) {
+        return this.categoryRepo.findOne({ where: { id } })
+    }
+
+    async getAllCategories() {
+        return this.categoryRepo.find();
+    }
+
+    async createCategory(category: DeepPartial<Category>) {
+        return this.categoryRepo.save(category);
+    }
+
+    async getVariablesByCategory(categoryId: number): Promise<Variable[]> {
+        const dataValues = await this.dataValueRepo.find({
+            where: {
+                category: { id: categoryId }
+            },
+        });
+
+        const variablesMap = new Map<number, Variable>();
+
+        for (const dv of dataValues) {
+            const variable = dv.catalog.variable;
+            variablesMap.set(variable.id, variable); // уникальность по id
+        }
+
+        return Array.from(variablesMap.values());
+    }
+
     // Поиск DataValue по category name
-    async findByCategoryName(name: string): Promise<DataValue[]> {
+    async findDataByCategoryId(id: number): Promise<DataValue[]> {
         return this.dataValueRepo.find({
-            where: { category: { name } },
-            relations: ['catalog', 'category', 'qcl'],
+            where: { category: { id } },
         });
     }
 
@@ -59,7 +87,6 @@ export class DataService {
     async findById(id: number): Promise<DataValue | null> {
         return this.dataValueRepo.findOne({
             where: { id },
-            relations: ['catalog', 'category', 'qcl'],
         });
     }
 

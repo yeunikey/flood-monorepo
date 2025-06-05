@@ -1,114 +1,136 @@
 'use client'
 
-import { api } from "@/api/instance"
-import Links from "@/components/LinkList"
-import CreateHydropostModal from "@/components/pages/data/CreateHydropostModal"
-import ImportHydropostsModal from "@/components/pages/data/ImportHydroposts"
-import View from "@/components/View"
-import { useAuth } from "@/hooks/auth"
-import { useSite } from "@/hooks/sites"
-import { ApiResponse, Site, SiteType } from "@/types"
+import { ApiResponse, Category, DataValue, Site, SiteType, Variable } from "@/types"
 import { Box, Button, IconButton, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
-import DeleteIcon from '@mui/icons-material/Delete'
-import { toast } from "react-toastify"
+
+import CreateCategoryModal from "@/components/data/CreateCategoryModal"
+import CreateHydropostModal from "@/components/data/AddModal"
+import ImportModal from "@/components/data/ImportModal"
+import Links from "@/components/LinkList"
+import View from "@/components/View"
+import { api } from "@/api/instance"
+import { useAuth } from "@/hooks/auth"
+import { useCategories } from "@/hooks/category"
 
 export default function DataPage() {
-
+    const { token } = useAuth();
+    const { categories, setCategories } = useCategories();
     const [tab, setTab] = useState(0)
 
-    const [hydropostModal, setHydropostModal] = useState(false);
+    const [fetching, setFetching] = useState(true);
+
+    const [variables, setVariables] = useState<Variable[]>([]);
+    const [dataValues, setDataValues] = useState<DataValue[]>([]);
+
     const [importModal, setImportModal] = useState(false);
+    const [createCategoryModal, setCreateCategoryModal] = useState(false);
 
-    const { token } = useAuth();
-    const { types, setTypes, sites, setSites } = useSite();
-
-    // const [fetching, setFetching] = useState(true);
-
-    const handleDownload = async () => {
-        const headers = ['name', 'code', 'altitude', 'longtitude'];
-        const rows = sites.map(site =>
-            [site.name, site.code, site.altitude, site.longtitude]
-        );
-
-        const csvContent =
-            [headers, ...rows]
-                .map(e => e.join(','))
-                .join('\n');
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'sites.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    const handleDelete = async (site_id: number) => {
-        await api.delete<ApiResponse<Site[]>>('/sites?site_id=' + site_id, {
-            headers: {
-                Authorization: 'Bearer ' + token
-            }
-        })
-            .then(({ data }) => {
-                if (data.statusCode != 200) {
-                    toast.error(data.message);
-                }
-
-                setSites(sites.filter(s => s.id != site_id))
-
-            });
-    }
-
-    const fetchData = async () => {
-        await api.get<ApiResponse<Site[]>>('/sites/filter?site_type=' + types[tab].id, {
+    const fetchDataValue = async () => {
+        await api.get<ApiResponse<DataValue[]>>(`/data/category/${categories[tab].id}`, {
             headers: {
                 Authorization: 'Bearer ' + token
             }
         })
             .then((response) => {
-                setSites(response.data.data)
+                setDataValues(response.data.data)
             });
     }
 
-    const fetchTypes = async () => {
-        await api.get<ApiResponse<SiteType[]>>('/sites/types', {
+    const fetchVariables = async () => {
+        await api.get<ApiResponse<Variable[]>>(`/data/category/${categories[tab].id}/variables`, {
             headers: {
                 Authorization: 'Bearer ' + token
             }
         })
-            .then(({ data }) => {
-                setTypes(data.data);
-            }).finally(() => {
-                // setFetching(false);
-            })
+            .then((response) => {
+                setVariables(response.data.data.reverse())
+            });
+    }
+
+    const fetchCategories = async () => {
+        setFetching(true);
+
+        await api.get<ApiResponse<Category[]>>('/data/category', {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((response) => {
+                setCategories(response.data.data)
+                setFetching(false);
+            });
     }
 
     useEffect(() => {
-        if (token == "" || types.length != 0) {
-            // setFetching(false);
-            return;
-        }
+        if (categories.length === 0 || !categories[tab]) return;
 
-        fetchTypes();
-    }, [token])
+        fetchVariables();
+        fetchDataValue();
+    }, [tab, categories]);
 
     useEffect(() => {
-        if (types.length == 0) {
+        if (categories.length != 0 || token == "") {
             return;
         }
 
-        fetchData();
-    }, [tab, types]);
+        fetchCategories();
+    }, [token]);
+
+    if (fetching) {
+        return (
+            <div className="test">
+                Loading
+            </div>
+        )
+    }
+
+    if (!fetching && categories.length == 0) {
+        return (
+            <View>
+
+                <CreateCategoryModal open={createCategoryModal} setOpen={setCreateCategoryModal} />
+                <ImportModal open={importModal} setOpen={setImportModal} />
+
+                <Links>
+                    <Typography sx={{ color: 'inherit' }}>Паводки</Typography>
+                    <Typography sx={{ color: 'text.primary' }}>Общая информация</Typography>
+                </Links>
+
+                <div className="grow flex flex-col items-center justify-center">
+
+                    <div className="text-xl">
+                        В базе не хранятся никакие данные
+                    </div>
+
+                    <div className="flex gap-3 mt-6">
+                        <Button variant="contained" disableElevation={true}
+                            onClick={() => {
+                                setCreateCategoryModal(true)
+                            }}
+                        >
+                            Создать категорию
+                        </Button>
+                        <Button variant="contained" disableElevation={true}
+                            onClick={() => {
+                                // setHydropostModal(true)
+                            }}
+                        >
+                            Импортировать
+                        </Button>
+                    </div>
+
+                </div>
+            </View>
+        )
+    }
 
     return (
         <View>
 
-            <CreateHydropostModal open={hydropostModal} setOpen={setHydropostModal} />
-            <ImportHydropostsModal open={importModal} setOpen={setImportModal} type={types[tab]} />
+            {/* <CreateHydropostModal open={hydropostModal} setOpen={setHydropostModal} /> */}
+            <CreateCategoryModal open={createCategoryModal} setOpen={setCreateCategoryModal} />
+            <ImportModal open={importModal} setOpen={setImportModal} category={categories[tab]} />
 
             <Links>
                 <Typography sx={{ color: 'inherit' }}>Паводки</Typography>
@@ -125,8 +147,8 @@ export default function DataPage() {
                     scrollButtons="auto"
                     aria-label="scrollable auto tabs example"
                 >
-                    {types.map((type) => (
-                        <Tab label={type.name} />
+                    {categories.map((category) => (
+                        <Tab key={category.id} label={category.name} />
                     ))}
                 </Tabs>
 
@@ -134,7 +156,14 @@ export default function DataPage() {
                     <div className="flex gap-2">
                         <Button variant="contained" size="small" disableElevation={true}
                             onClick={() => {
-                                setHydropostModal(true)
+                                setCreateCategoryModal(true)
+                            }}
+                        >
+                            Создать категорию
+                        </Button>
+                        <Button variant="contained" size="small" disableElevation={true}
+                            onClick={() => {
+                                // setHydropostModal(true)
                             }}
                         >
                             Добавить
@@ -143,22 +172,46 @@ export default function DataPage() {
                             onClick={() => {
                                 setImportModal(true);
                             }}
-                        >Импортировать .csv</Button>
-                        <Button variant="outlined" size="small" disableElevation={true} onClick={handleDownload}>Экспортировать .csv</Button>
+                        >Импортировать</Button>
+                        {/* <Button variant="outlined" size="small" disableElevation={true} onClick={handleDownload}>Экспортировать .csv</Button> */}
                     </div>
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Название</TableCell>
-                                    <TableCell align="right">Код</TableCell>
-                                    <TableCell align="right">Широта</TableCell>
-                                    <TableCell align="right">Долгота</TableCell>
-                                    <TableCell align="right">Действия</TableCell>
+                                    <TableCell>ID</TableCell>
+                                    {variables.map((variable) => {
+                                        return (
+                                            <TableCell key={variable.id} align="right">{variable.name}</TableCell>
+                                        )
+                                    })}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {sites.map((site) => (
+                                {Object.entries(
+                                    dataValues.reduce((acc, item) => {
+                                        const siteCode = item.catalog.site.code;
+                                        if (!acc[siteCode]) {
+                                            acc[siteCode] = {
+                                                site: item.catalog.site,
+                                                values: {},
+                                            };
+                                        }
+                                        acc[siteCode].values[item.catalog.variable.name] = item.value;
+                                        return acc;
+                                    }, {} as Record<string, { site: Site; values: Record<string, number> }>)
+                                ).map(([siteCode, { site, values }]) => (
+                                    <TableRow key={siteCode}>
+                                        <TableCell>{siteCode}</TableCell>
+                                        {variables.map((variable) => (
+                                            <TableCell key={variable.id} align="right">
+                                                {values[variable.name] ?? "-"}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+
+                                {/* {sites.map((site) => (
                                     <TableRow
                                         key={site.name}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -181,7 +234,7 @@ export default function DataPage() {
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                ))} */}
                             </TableBody>
                         </Table>
                     </TableContainer>
